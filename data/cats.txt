@@ -1,0 +1,13 @@
+lion
+tiger
+leopard
+jaguar
+cheetah
+cougar
+lynx
+bobcat
+caracal
+serval
+ocelot
+margay
+puma

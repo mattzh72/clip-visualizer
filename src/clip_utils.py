@@ -1,23 +1,21 @@
 import os
 
 import torch
-from transformers import AutoTokenizer, CLIPTextModelWithProjection
+import clip
 
 
 def load_model():
-    os.environ['HF_HOME'] = '/viscam/u/mattzh1314'
-    return CLIPTextModelWithProjection.from_pretrained("openai/clip-vit-base-patch32", cache_dir='/viscam/u/mattzh1314')
+    model, preprocess = clip.load("ViT-B/32", device='cuda', download_root='/viscam/u/mattzh1314/')
+    return model
 
-def load_tokenizer():
-    os.environ['HF_HOME'] = '/viscam/u/mattzh1314'
-    return AutoTokenizer.from_pretrained("openai/clip-vit-base-patch32", cache_dir='/viscam/u/mattzh1314')
+def get_text_embed(sentence, model):
+    text = clip.tokenize([sentence]).cuda()
 
-def get_text_embed(text, model, tokenizer):
-    inputs = tokenizer(text, padding=True, return_tensors="pt")
     with torch.no_grad():
-        outputs = model(**inputs)
-    return outputs.text_embeds.squeeze(0)
-
+        text_features = model.encode_text(text)
+    
+    return text_features.squeeze(0)
+    
 def get_similarity(e1, e2):
     dot_product = torch.dot(e1, e2)
     norm_e1 = torch.norm(e1)
